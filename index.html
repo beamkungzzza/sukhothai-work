@@ -146,42 +146,30 @@
     .card-fav-btn.active { color: #f59e0b; }
     .card-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 12px; padding-left: 48px; }
     .card-actions { display: flex; gap: 8px; padding-left: 48px; }
+    
     .btn-open {
       flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 4px;
-      background: var(--primary-gradient); color: white; text-decoration: none;
-      padding: 8px 10px; border-radius: 10px; font-size: 0.82rem; font-weight: 600;
+      background: var(--primary-gradient); color: white; border: none;
+      padding: 9px 10px; border-radius: 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+      font-family: inherit;
     }
     .btn-copy {
       background: var(--card-bg); border: 1px solid var(--border); color: var(--text-muted);
-      padding: 7px 10px; border-radius: 10px; font-size: 0.8rem; cursor: pointer;
+      padding: 8px 10px; border-radius: 10px; font-size: 0.8rem; cursor: pointer;
+      font-family: inherit;
     }
 
     .empty-state { text-align: center; padding: 40px 10px; color: var(--text-muted); display: none; }
     .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 6px; }
 
-    /* ปุ่มลอยเพิ่มงานใหม่ (FAB) */
     .fab-add {
-      position: fixed;
-      bottom: 78px;
-      right: 18px;
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: var(--primary-gradient);
-      color: white;
-      border: none;
-      box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
-      font-size: 1.6rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 95;
-      transition: transform 0.2s;
+      position: fixed; bottom: 78px; right: 18px; width: 52px; height: 52px; border-radius: 50%;
+      background: var(--primary-gradient); color: white; border: none;
+      box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4); font-size: 1.6rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; z-index: 95; transition: transform 0.2s;
     }
     .fab-add:active { transform: scale(0.92); }
 
-    /* หน้าต่างฟอร์มกรอกข้อมูล (Modal Sheet) */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);
@@ -292,10 +280,8 @@
     </div>
   </main>
 
-  <!-- ปุ่มลอยเพิ่มงานใหม่ -->
   <button class="fab-add" id="openAddModal" title="เพิ่มระบบงานใหม่">＋</button>
 
-  <!-- หน้าต่างฟอร์มกรอกข้อมูล -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal-sheet">
       <div class="modal-header">
@@ -347,10 +333,9 @@
   <div class="toast" id="toast">📋 คัดลอกลิงก์แล้ว</div>
 
   <script>
-    // เชื่อมต่อ Apps Script Web App URL เรียบร้อยแล้ว
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHQaThqqPz9aS0RknUPZB8TS-4h0j4au0oOucd98BsRiSbtb49hJ6-qDpmVH8LnQi9/exec";
 
-    // ข้อมูลเริ่มต้นสำรองกรณีออฟไลน์
+    // ฐานข้อมูลเริ่มต้น 38 รายการ (พร้อม URL ตรง)
     let DATA = [
       {"id": 1, "seq": 1, "cat_id": "management", "cat_short": "บริหารและติดตาม", "name": "ตารางงาน SUK", "description": "บันทึกงาน ปัญหา ขั้นตอนถัดไป และผู้รับผิดชอบ", "url": "https://docs.google.com/spreadsheets/d/1-g0Px1bxaeeNbbom9ZsNL0mCWlgfr3qBXHxcswMq6QU/edit", "icon": "📋"},
       {"id": 2, "seq": 2, "cat_id": "management", "cat_short": "บริหารและติดตาม", "name": "คณะสุโขทัย — ระบบติดตามงาน", "description": "รวบรวมงาน รายชื่อทีม (P01-P05) และประวัติการอัปเดต", "url": "https://docs.google.com/spreadsheets/d/1c3Rqaly6fqmZS9N1m4PeSt_glXhkRhibwgYiqpoIix8/edit", "icon": "📋"},
@@ -421,6 +406,35 @@
       setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
+    // ฟังก์ชันตรวจสอบและล้าง URL ป้องกันการเด้งกลับหน้าเดิม
+    function sanitizeUrl(raw) {
+      if (Array.isArray(raw) && raw.length > 0) raw = raw[0];
+      raw = String(raw || '').trim().replace(/^["']|["']$/g, '');
+      return (raw.startsWith('http://') || raw.startsWith('https://')) ? raw : '';
+    }
+
+    // ฟังก์ชันเปิดลิงก์แบบปลอดภัยในแท็บใหม่
+    function openLink(rawUrl) {
+      const targetUrl = sanitizeUrl(rawUrl);
+      if (!targetUrl) {
+        showToast('⚠️ ไม่พบลิงก์ชีตสำหรับรายการนี้');
+        return;
+      }
+      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    }
+
+    function copyLink(rawUrl, e) {
+      e.stopPropagation();
+      const targetUrl = sanitizeUrl(rawUrl);
+      if (!targetUrl) {
+        showToast('⚠️ ไม่มีลิงก์ให้คัดลอก');
+        return;
+      }
+      navigator.clipboard.writeText(targetUrl)
+        .then(() => showToast('📋 คัดลอกลิงก์แล้ว'))
+        .catch(() => showToast('คัดลอกไม่สำเร็จ'));
+    }
+
     function toggleFavorite(id, e) {
       e.stopPropagation();
       const idx = favorites.indexOf(id);
@@ -434,11 +448,6 @@
       localStorage.setItem('suk_favs', JSON.stringify(favorites));
       updateFavCount();
       renderCards();
-    }
-
-    function copyLink(url, e) {
-      e.stopPropagation();
-      navigator.clipboard.writeText(url).then(() => showToast('📋 คัดลอกลิงก์แล้ว')).catch(() => showToast('คัดลอกไม่สำเร็จ'));
     }
 
     function updateCounters() {
@@ -488,8 +497,12 @@
             </div>
             <p class="card-desc">${it.description || '-'}</p>
             <div class="card-actions">
-              <a href="${it.url}" target="_blank" rel="noopener noreferrer" class="btn-open">เปิดไฟล์ชีต ↗</a>
-              <button class="btn-copy" onclick="copyLink('${it.url}', event)">🔗 คัดลอก</button>
+              <button type="button" class="btn-open" onclick="openLink('${it.url}')">
+                เปิดไฟล์ชีต ↗
+              </button>
+              <button type="button" class="btn-copy" onclick="copyLink('${it.url}', event)">
+                🔗 คัดลอก
+              </button>
             </div>
           </div>
         `;
@@ -511,7 +524,6 @@
       renderCards();
     }
 
-    // ดึงข้อมูลล่าสุดจาก Apps Script Web App
     async function fetchLatestData(isManual = false) {
       if (!APPS_SCRIPT_URL) return;
       refreshBtn.classList.add('spin');
@@ -527,14 +539,13 @@
           if (isManual) showToast('✅ ข้อมูลอัปเดตตรงกับชีตแล้ว');
         }
       } catch (err) {
-        console.warn('Sync failed, using offline cache:', err);
+        console.warn('Sync fallback:', err);
         if (isManual) showToast('⚠️ ใช้ข้อมูลล่าสุดในเครื่อง');
       } finally {
         refreshBtn.classList.remove('spin');
       }
     }
 
-    // ส่งฟอร์มเพิ่มงานใหม่เข้า Google Sheets
     addSystemForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const payload = {
@@ -560,7 +571,6 @@
         addSystemForm.reset();
         modalOverlay.classList.remove('active');
 
-        // ดึงข้อมูลใหม่อัตโนมัติหลังจากบันทึกเสร็จ
         setTimeout(() => fetchLatestData(false), 2000);
       } catch (err) {
         alert('เกิดข้อผิดพลาด: ' + err.message);
@@ -610,8 +620,6 @@
     updateFavCount();
     updateCounters();
     renderCards();
-
-    // ซิงค์ข้อมูลสดทันทีเมื่อเปิดเว็บ
     fetchLatestData(false);
   </script>
 </body>
