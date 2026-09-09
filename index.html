@@ -18,10 +18,10 @@
       --text-main: #0f172a;
       --text-muted: #64748b;
       --border: #e2e8f0;
-      --nav-bg: rgba(255, 255, 255, 0.9);
+      --nav-bg: rgba(255, 255, 255, 0.92);
       --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
-      --shadow-lg: 0 10px 15px -3px rgba(244, 63, 94, 0.15);
+      --shadow-lg: 0 10px 18px -3px rgba(244, 63, 94, 0.18);
       --card-radius: 18px;
     }
 
@@ -35,7 +35,7 @@
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --border: #243046;
-      --nav-bg: rgba(22, 30, 46, 0.92);
+      --nav-bg: rgba(22, 30, 46, 0.94);
       --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
       --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.4);
     }
@@ -45,7 +45,7 @@
       font-family: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--bg);
       color: var(--text-main);
-      padding-bottom: 85px;
+      padding-bottom: 95px;
       min-height: 100vh;
       line-height: 1.5;
       transition: background-color 0.2s, color 0.2s;
@@ -64,10 +64,17 @@
       background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(8px);
       padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
     }
-    .theme-toggle {
+    .header-actions { display: flex; gap: 8px; }
+    .icon-btn {
       background: rgba(255, 255, 255, 0.2); border: none; color: white;
-      width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem; cursor: pointer;
+      width: 36px; height: 36px; border-radius: 50%; font-size: 1.05rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);
+      transition: transform 0.15s;
     }
+    .icon-btn:active { transform: scale(0.9); }
+    .spin { animation: spin 1s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
     .header-title { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; }
     .header-subtitle { font-size: 0.82rem; opacity: 0.92; margin-bottom: 14px; }
 
@@ -152,6 +159,57 @@
     .empty-state { text-align: center; padding: 40px 10px; color: var(--text-muted); display: none; }
     .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 6px; }
 
+    /* ปุ่มลอยเพิ่มงานใหม่ (FAB) */
+    .fab-add {
+      position: fixed;
+      bottom: 78px;
+      right: 18px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
+      font-size: 1.6rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 95;
+      transition: transform 0.2s;
+    }
+    .fab-add:active { transform: scale(0.92); }
+
+    /* หน้าต่างฟอร์มกรอกข้อมูล (Modal Sheet) */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);
+      z-index: 150; display: none; opacity: 0; transition: opacity 0.2s ease;
+    }
+    .modal-overlay.active { display: flex; align-items: flex-end; opacity: 1; }
+    .modal-sheet {
+      background: var(--card-bg); width: 100%; max-width: 600px; margin: 0 auto;
+      border-radius: 24px 24px 0 0; padding: 20px 20px calc(24px + env(safe-area-inset-bottom));
+      box-shadow: var(--shadow-lg); transform: translateY(100%); transition: transform 0.25s ease-out;
+    }
+    .modal-overlay.active .modal-sheet { transform: translateY(0); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .modal-title { font-size: 1.15rem; font-weight: 700; color: var(--text-main); }
+    .modal-close { background: none; border: none; font-size: 1.3rem; color: var(--text-muted); cursor: pointer; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-main); margin-bottom: 6px; }
+    .form-control {
+      width: 100%; padding: 10px 12px; border-radius: 12px; border: 1.5px solid var(--border);
+      background: var(--bg); color: var(--text-main); font-family: inherit; font-size: 0.9rem; outline: none;
+    }
+    .form-control:focus { border-color: var(--primary); }
+    .btn-submit {
+      width: 100%; background: var(--primary-gradient); color: white; border: none;
+      padding: 12px; border-radius: 14px; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 8px;
+    }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
       background: var(--nav-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -179,16 +237,19 @@
   <header class="app-header">
     <div class="header-top">
       <div class="brand-pill">🌸 SUKHOTHAI PINK TEAM</div>
-      <button class="theme-toggle" id="themeBtn">🌙</button>
+      <div class="header-actions">
+        <button class="icon-btn" id="refreshBtn" title="ซิงค์ข้อมูลล่าสุดจากชีต">🔄</button>
+        <button class="icon-btn" id="themeBtn" title="สลับโหมดสว่าง/มืด">🌙</button>
+      </div>
     </div>
     <h1 class="header-title">ศูนย์รวมระบบงานคณะสุโขทัย</h1>
-    <p class="header-subtitle">รวบรวมชีตงานและแบบฟอร์ม 38 รายการ สะดวก รวดเร็ว บนมือถือ</p>
+    <p class="header-subtitle">ซิงค์แบบ Real-time กับชีตหลัก พร้อมฟอร์มเพิ่มงานในมือถือ</p>
 
     <div class="stats-row">
-      <div class="stat-pill" onclick="filterCategory('all')"><span class="num">38</span><span class="label">ทั้งหมด</span></div>
-      <div class="stat-pill" onclick="filterCategory('management')"><span class="num">10</span><span class="label">บริหาร</span></div>
-      <div class="stat-pill" onclick="filterCategory('recruitment')"><span class="num">10</span><span class="label">รับสมัคร</span></div>
-      <div class="stat-pill" onclick="filterCategory('athletes')"><span class="num">15</span><span class="label">นักกีฬา</span></div>
+      <div class="stat-pill" onclick="filterCategory('all')"><span class="num" id="statAll">38</span><span class="label">ทั้งหมด</span></div>
+      <div class="stat-pill" onclick="filterCategory('management')"><span class="num" id="statMan">10</span><span class="label">บริหาร</span></div>
+      <div class="stat-pill" onclick="filterCategory('recruitment')"><span class="num" id="statRec">10</span><span class="label">รับสมัคร</span></div>
+      <div class="stat-pill" onclick="filterCategory('athletes')"><span class="num" id="statAth">15</span><span class="label">นักกีฬา</span></div>
     </div>
   </header>
 
@@ -210,12 +271,12 @@
     </div>
 
     <nav class="category-scroll" id="categoryTabs">
-      <button class="cat-chip active" data-cat="all">📌 ทั้งหมด <span class="count">38</span></button>
+      <button class="cat-chip active" data-cat="all">📌 ทั้งหมด <span class="count" id="chipCountAll">38</span></button>
       <button class="cat-chip" data-cat="fav">⭐ รายการโปรด <span class="count" id="favCount">0</span></button>
-      <button class="cat-chip" data-cat="management">📊 บริหาร <span class="count">10</span></button>
-      <button class="cat-chip" data-cat="recruitment">📝 รับสมัคร <span class="count">10</span></button>
-      <button class="cat-chip" data-cat="athletes">🏃 นักกีฬา <span class="count">15</span></button>
-      <button class="cat-chip" data-cat="inventory">📦 คลังพัสดุ <span class="count">3</span></button>
+      <button class="cat-chip" data-cat="management">📊 บริหาร <span class="count" id="chipCountMan">10</span></button>
+      <button class="cat-chip" data-cat="recruitment">📝 รับสมัคร <span class="count" id="chipCountRec">10</span></button>
+      <button class="cat-chip" data-cat="athletes">🏃 นักกีฬา <span class="count" id="chipCountAth">15</span></button>
+      <button class="cat-chip" data-cat="inventory">📦 คลังพัสดุ <span class="count" id="chipCountInv">3</span></button>
     </nav>
 
     <div class="filter-summary">
@@ -230,6 +291,43 @@
       <p>ไม่พบรายการที่ค้นหา ลองพิมพ์คำค้นหาอื่นดูนะ</p>
     </div>
   </main>
+
+  <!-- ปุ่มลอยเพิ่มงานใหม่ -->
+  <button class="fab-add" id="openAddModal" title="เพิ่มระบบงานใหม่">＋</button>
+
+  <!-- หน้าต่างฟอร์มกรอกข้อมูล -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3 class="modal-title">➕ เพิ่มระบบงานใหม่</h3>
+        <button class="modal-close" id="closeModal">✕</button>
+      </div>
+      <form id="addSystemForm">
+        <div class="form-group">
+          <label for="formCategory">หมวดหมู่</label>
+          <select id="formCategory" class="form-control" required>
+            <option value="หมวดที่ 1: บริหารและติดตามงาน">1. บริหารและติดตามงาน</option>
+            <option value="หมวดที่ 2: รับสมัครและคัดเลือก">2. รับสมัครและคัดเลือก</option>
+            <option value="หมวดที่ 3: ทะเบียนนักกีฬา">3. ทะเบียนนักกีฬา</option>
+            <option value="หมวดที่ 4: คลังพัสดุและยืมคืน">4. คลังพัสดุและยืมคืน</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="formName">ชื่องาน / ระบบ</label>
+          <input type="text" id="formName" class="form-control" placeholder="เช่น รายชื่อวิ่งผลัด, ตารางนัดประชุม" required>
+        </div>
+        <div class="form-group">
+          <label for="formDesc">วัตถุประสงค์ / คำอธิบาย</label>
+          <input type="text" id="formDesc" class="form-control" placeholder="เช่น บันทึกรายชื่อและเวลาซ้อม">
+        </div>
+        <div class="form-group">
+          <label for="formUrl">ลิงก์เข้าถึง (Google Sheets / Docs / Form)</label>
+          <input type="url" id="formUrl" class="form-control" placeholder="https://docs.google.com/..." required>
+        </div>
+        <button type="submit" class="btn-submit" id="submitBtn">บันทึกลงชีตทันที</button>
+      </form>
+    </div>
+  </div>
 
   <nav class="bottom-nav">
     <button class="nav-item active" onclick="filterCategory('all'); window.scrollTo({top:0, behavior:'smooth'});">
@@ -249,7 +347,11 @@
   <div class="toast" id="toast">📋 คัดลอกลิงก์แล้ว</div>
 
   <script>
-    const DATA = [
+    // เชื่อมต่อ Apps Script Web App URL เรียบร้อยแล้ว
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHQaThqqPz9aS0RknUPZB8TS-4h0j4au0oOucd98BsRiSbtb49hJ6-qDpmVH8LnQi9/exec";
+
+    // ข้อมูลเริ่มต้นสำรองกรณีออฟไลน์
+    let DATA = [
       {"id": 1, "seq": 1, "cat_id": "management", "cat_short": "บริหารและติดตาม", "name": "ตารางงาน SUK", "description": "บันทึกงาน ปัญหา ขั้นตอนถัดไป และผู้รับผิดชอบ", "url": "https://docs.google.com/spreadsheets/d/1-g0Px1bxaeeNbbom9ZsNL0mCWlgfr3qBXHxcswMq6QU/edit", "icon": "📋"},
       {"id": 2, "seq": 2, "cat_id": "management", "cat_short": "บริหารและติดตาม", "name": "คณะสุโขทัย — ระบบติดตามงาน", "description": "รวบรวมงาน รายชื่อทีม (P01-P05) และประวัติการอัปเดต", "url": "https://docs.google.com/spreadsheets/d/1c3Rqaly6fqmZS9N1m4PeSt_glXhkRhibwgYiqpoIix8/edit", "icon": "📋"},
       {"id": 3, "seq": 3, "cat_id": "management", "cat_short": "บริหารและติดตาม", "name": "ตรวจสอบความคืบหน้าปัญหา SKT", "description": "ตารางติดตามความคืบหน้าปัญหาที่แจ้ง", "url": "https://docs.google.com/spreadsheets/d/1hpvhtoMnJ-96E_iunPvEtnCM6V68eYtKAk58z_KdkHU/edit", "icon": "⚠️"},
@@ -302,14 +404,21 @@
     const emptyState = document.getElementById('emptyState');
     const activeFilterLabel = document.getElementById('activeFilterLabel');
     const themeBtn = document.getElementById('themeBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
     const toast = document.getElementById('toast');
+
+    const openAddModal = document.getElementById('openAddModal');
+    const closeModal = document.getElementById('closeModal');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const addSystemForm = document.getElementById('addSystemForm');
+    const submitBtn = document.getElementById('submitBtn');
 
     function updateFavCount() { favCount.textContent = favorites.length; }
 
     function showToast(msg) {
       toast.textContent = msg;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 1800);
+      setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
     function toggleFavorite(id, e) {
@@ -332,6 +441,25 @@
       navigator.clipboard.writeText(url).then(() => showToast('📋 คัดลอกลิงก์แล้ว')).catch(() => showToast('คัดลอกไม่สำเร็จ'));
     }
 
+    function updateCounters() {
+      const all = DATA.length;
+      const man = DATA.filter(d => d.cat_id === 'management').length;
+      const rec = DATA.filter(d => d.cat_id === 'recruitment').length;
+      const ath = DATA.filter(d => d.cat_id === 'athletes').length;
+      const inv = DATA.filter(d => d.cat_id === 'inventory').length;
+
+      document.getElementById('statAll').textContent = all;
+      document.getElementById('statMan').textContent = man;
+      document.getElementById('statRec').textContent = rec;
+      document.getElementById('statAth').textContent = ath;
+
+      document.getElementById('chipCountAll').textContent = all;
+      document.getElementById('chipCountMan').textContent = man;
+      document.getElementById('chipCountRec').textContent = rec;
+      document.getElementById('chipCountAth').textContent = ath;
+      document.getElementById('chipCountInv').textContent = inv;
+    }
+
     function renderCards() {
       const q = searchInput.value.trim().toLowerCase();
       let list = DATA.filter(it => {
@@ -349,7 +477,7 @@
         return `
           <div class="card">
             <div class="card-header">
-              <div class="card-icon-box">${it.icon}</div>
+              <div class="card-icon-box">${it.icon || '📄'}</div>
               <div class="card-title-group">
                 <span class="card-category-tag">${it.cat_short} #${it.seq}</span>
                 <div class="card-title">${it.name}</div>
@@ -383,6 +511,71 @@
       renderCards();
     }
 
+    // ดึงข้อมูลล่าสุดจาก Apps Script Web App
+    async function fetchLatestData(isManual = false) {
+      if (!APPS_SCRIPT_URL) return;
+      refreshBtn.classList.add('spin');
+      if (isManual) showToast('🔄 กำลังซิงค์ข้อมูลจากชีต...');
+
+      try {
+        const res = await fetch(APPS_SCRIPT_URL);
+        const json = await res.json();
+        if (json.status === 'success' && Array.isArray(json.data) && json.data.length > 0) {
+          DATA = json.data;
+          updateCounters();
+          renderCards();
+          if (isManual) showToast('✅ ข้อมูลอัปเดตตรงกับชีตแล้ว');
+        }
+      } catch (err) {
+        console.warn('Sync failed, using offline cache:', err);
+        if (isManual) showToast('⚠️ ใช้ข้อมูลล่าสุดในเครื่อง');
+      } finally {
+        refreshBtn.classList.remove('spin');
+      }
+    }
+
+    // ส่งฟอร์มเพิ่มงานใหม่เข้า Google Sheets
+    addSystemForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        category: document.getElementById('formCategory').value,
+        name: document.getElementById('formName').value.trim(),
+        description: document.getElementById('formDesc').value.trim(),
+        url: document.getElementById('formUrl').value.trim()
+      };
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ กำลังบันทึกลงชีต...';
+      showToast('กำลังส่งข้อมูลลง Google Sheets...');
+
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        showToast('🎉 บันทึกลงชีตสำเร็จแล้ว!');
+        addSystemForm.reset();
+        modalOverlay.classList.remove('active');
+
+        // ดึงข้อมูลใหม่อัตโนมัติหลังจากบันทึกเสร็จ
+        setTimeout(() => fetchLatestData(false), 2000);
+      } catch (err) {
+        alert('เกิดข้อผิดพลาด: ' + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'บันทึกลงชีตทันที';
+      }
+    });
+
+    openAddModal.addEventListener('click', () => modalOverlay.classList.add('active'));
+    closeModal.addEventListener('click', () => modalOverlay.classList.remove('active'));
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) modalOverlay.classList.remove('active');
+    });
+
     categoryTabs.addEventListener('click', (e) => {
       const btn = e.target.closest('.cat-chip');
       if (btn) filterCategory(btn.getAttribute('data-cat'));
@@ -408,12 +601,18 @@
       localStorage.setItem('suk_theme', next);
     });
 
+    refreshBtn.addEventListener('click', () => fetchLatestData(true));
+
     const savedTheme = localStorage.getItem('suk_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', savedTheme);
     themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 
     updateFavCount();
+    updateCounters();
     renderCards();
+
+    // ซิงค์ข้อมูลสดทันทีเมื่อเปิดเว็บ
+    fetchLatestData(false);
   </script>
 </body>
 </html>
