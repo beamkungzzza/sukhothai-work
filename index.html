@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ระบบศูนย์รวมการดำเนินงาน • คณะสุโขทัย (Pink Team)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #f43f5e;
+      --primary-dark: #e11d48;
+      --primary-light: #ffe4e6;
+      --primary-gradient: linear-gradient(135deg, #f43f5e 0%, #ec4899 100%);
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --nav-bg: rgba(255, 255, 255, 0.9);
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+      --shadow-lg: 0 10px 15px -3px rgba(244, 63, 94, 0.15);
+      --card-radius: 18px;
+    }
+
+    [data-theme="dark"] {
+      --primary: #fb7185;
+      --primary-dark: #f43f5e;
+      --primary-light: #881337;
+      --primary-gradient: linear-gradient(135deg, #f43f5e 0%, #be185d 100%);
+      --bg: #0b0f19;
+      --card-bg: #161e2e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #243046;
+      --nav-bg: rgba(22, 30, 46, 0.92);
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      padding-bottom: 85px;
+      min-height: 100vh;
+      line-height: 1.5;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .app-header {
+      background: var(--primary-gradient);
+      color: white;
+      padding: 22px 18px 18px;
+      border-radius: 0 0 26px 26px;
+      box-shadow: var(--shadow-lg);
+    }
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .brand-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(8px);
+      padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+    }
+    .theme-toggle {
+      background: rgba(255, 255, 255, 0.2); border: none; color: white;
+      width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem; cursor: pointer;
+    }
+    .header-title { font-size: 1.35rem; font-weight: 700; margin-bottom: 4px; }
+    .header-subtitle { font-size: 0.82rem; opacity: 0.92; margin-bottom: 14px; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.18); border-radius: 12px; padding: 6px 4px; text-align: center;
+      cursor: pointer; transition: transform 0.1s;
+    }
+    .stat-pill:active { transform: scale(0.95); }
+    .stat-pill .num { display: block; font-size: 1.05rem; font-weight: 700; }
+    .stat-pill .label { display: block; font-size: 0.65rem; opacity: 0.9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .container { max-width: 600px; margin: 0 auto; padding: 14px 14px 20px; }
+
+    .master-banner {
+      background: rgba(244, 63, 94, 0.08); border: 1px dashed var(--primary);
+      border-radius: 14px; padding: 10px 14px; margin-bottom: 14px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .master-banner strong { font-size: 0.85rem; color: var(--primary-dark); display: block; }
+    .master-banner span { font-size: 0.78rem; color: var(--text-muted); }
+    .master-btn {
+      background: var(--primary); color: white; text-decoration: none;
+      font-size: 0.75rem; font-weight: 600; padding: 6px 10px; border-radius: 8px; white-space: nowrap;
+    }
+
+    .search-section { position: sticky; top: 10px; z-index: 50; margin-bottom: 12px; }
+    .search-box {
+      display: flex; align-items: center; background: var(--card-bg);
+      border-radius: 14px; border: 1.5px solid var(--border); box-shadow: var(--shadow-sm);
+    }
+    .search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15); }
+    .search-icon { padding-left: 12px; font-size: 1rem; color: var(--text-muted); }
+    .search-input { width: 100%; border: none; outline: none; background: transparent; padding: 10px; font-size: 0.92rem; font-family: inherit; color: var(--text-main); }
+    .search-clear { background: none; border: none; padding: 8px 12px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; display: none; }
+    .search-clear.visible { display: block; }
+
+    .category-scroll { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 12px; scrollbar-width: none; }
+    .category-scroll::-webkit-scrollbar { display: none; }
+    .cat-chip {
+      flex: 0 0 auto; display: flex; align-items: center; gap: 4px;
+      padding: 6px 12px; border-radius: 18px; background: var(--card-bg);
+      border: 1px solid var(--border); color: var(--text-muted); font-size: 0.8rem; font-weight: 500; cursor: pointer;
+    }
+    .cat-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .cat-chip .count { font-size: 0.7rem; padding: 1px 5px; border-radius: 8px; background: rgba(0, 0, 0, 0.05); }
+    .cat-chip.active .count { background: rgba(255, 255, 255, 0.25); }
+
+    .filter-summary { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; padding: 0 2px; }
+    .filter-summary strong { color: var(--primary); }
+
+    .cards-grid { display: flex; flex-direction: column; gap: 10px; }
+    .card {
+      background: var(--card-bg); border-radius: var(--card-radius);
+      border: 1px solid var(--border); padding: 14px; box-shadow: var(--shadow-sm);
+    }
+    .card-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+    .card-icon-box {
+      width: 38px; height: 38px; min-width: 38px; border-radius: 10px;
+      background: rgba(244, 63, 94, 0.08); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
+    }
+    .card-title-group { flex: 1; min-width: 0; }
+    .card-category-tag {
+      font-size: 0.65rem; font-weight: 600; color: var(--primary-dark);
+      background: var(--primary-light); padding: 2px 6px; border-radius: 5px; display: inline-block; margin-bottom: 2px;
+    }
+    .card-title { font-size: 0.92rem; font-weight: 600; line-height: 1.35; }
+    .card-fav-btn { background: none; border: none; font-size: 1.2rem; color: #cbd5e1; cursor: pointer; }
+    .card-fav-btn.active { color: #f59e0b; }
+    .card-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 12px; padding-left: 48px; }
+    .card-actions { display: flex; gap: 8px; padding-left: 48px; }
+    .btn-open {
+      flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+      background: var(--primary-gradient); color: white; text-decoration: none;
+      padding: 8px 10px; border-radius: 10px; font-size: 0.82rem; font-weight: 600;
+    }
+    .btn-copy {
+      background: var(--card-bg); border: 1px solid var(--border); color: var(--text-muted);
+      padding: 7px 10px; border-radius: 10px; font-size: 0.8rem; cursor: pointer;
+    }
+
+    .empty-state { text-align: center; padding: 40px 10px; color: var(--text-muted); display: none; }
+    .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 6px; }
+
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--nav-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border); display: flex; justify-content: space-around;
+      padding: 6px 0 calc(6px + env(safe-area-inset-bottom)); z-index: 100;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      color: var(--text-muted); font-size: 0.7rem; font-weight: 500;
+      background: none; border: none; cursor: pointer; font-family: inherit; text-decoration: none;
+    }
+    .nav-item.active { color: var(--primary); font-weight: 600; }
+    .nav-item .nav-icon { font-size: 1.2rem; }
+
+    .toast {
+      position: fixed; bottom: 75px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: rgba(15, 23, 42, 0.92); color: white; padding: 8px 16px;
+      border-radius: 20px; font-size: 0.8rem; opacity: 0; pointer-events: none; transition: all 0.2s; z-index: 200;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="header-top">
+      <div class="brand-pill">🌸 SUKHOTHAI PINK TEAM</div>
+      <button class="theme-toggle" id="themeBtn">🌙</button>
+    </div>
+    <h1 class="header-title">ศูนย์รวมระบบงานคณะสุโขทัย</h1>
+    <p class="header-subtitle">รวบรวมชีตงานและแบบฟอร์ม 38 รายการ สะดวก รวดเร็ว บนมือถือ</p>
+
+    <div class="stats-row">
+      <div class="stat-pill" onclick="filterCategory('all')"><span class="num">38</span><span class="label">ทั้งหมด</span></div>
+      <div class="stat-pill" onclick="filterCategory('management')"><span class="num">10</span><span class="label">บริหาร</span></div>
+      <div class="stat-pill" onclick="filterCategory('recruitment')"><span class="num">10</span><span class="label">รับสมัคร</span></div>
+      <div class="stat-pill" onclick="filterCategory('athletes')"><span class="num">15</span><span class="label">นักกีฬา</span></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="master-banner">
+      <div>
+        <strong>ชีตสารบัญหลัก</strong>
+        <span>การดำเนินงานทั้งหมดของคณะสุโขทัย</span>
+      </div>
+      <a href="https://docs.google.com/spreadsheets/d/1FTEvVUR1-Kreupu-6ZIr-3wTXDGJb52BvOgnTt5fVfc/edit" target="_blank" class="master-btn">เปิดชีตหลัก ↗</a>
+    </div>
+
+    <div class="search-section">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="ค้นหาชื่องาน, กีฬา, สตาฟ, คลัง..." autocomplete="off">
+        <button id="clearSearch" class="search-clear">✕</button>
+      </div>
+    </div>
+
+    <nav class="category-scroll" id="categoryTabs">
+      <button class="cat-chip active" data-cat="all">📌 ทั้งหมด <span class="count">38</span></button>
+      <button class="cat-chip" data-cat="fav">⭐ รายการโปรด <span class="count" id="favCount">0</span></button>
+      <button class="cat-chip" data-cat="management">📊 บริหาร <span class="count">10</span></button>
+      <button class="cat-chip" data-cat="recruitment">📝 รับสมัคร <span class="count">10</span></button>
+      <button class="cat-chip" data-cat="athletes">🏃 นักกีฬา <span class="count">15</span></button>
+      <button class="cat-chip" data-cat="inventory">📦 คลังพัสดุ <span class="count">3</span></button>
+    </nav>
+
+    <div class="filter-summary">
+      <span id="activeFilterLabel">แสดงทั้งหมด</span>
+      <span>พบ <strong id="itemCount">38</strong> รายการ</span>
+    </div>
+
+    <div class="cards-grid" id="cardsGrid"></div>
+
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🔎</div>
+      <p>ไม่พบรายการที่ค้นหา ลองพิมพ์คำค้นหาอื่นดูนะ</p>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="filterCategory('all'); window.scrollTo({top:0, behavior:'smooth'});">
+      <span class="nav-icon">🏠</span><span>หน้าหลัก</span>
+    </button>
+    <button class="nav-item" onclick="filterCategory('fav'); window.scrollTo({top:0, behavior:'smooth'});">
+      <span class="nav-icon">⭐</span><span>รายการโปรด</span>
+    </button>
+    <button class="nav-item" onclick="document.getElementById('searchInput').focus();">
+      <span class="nav-icon">🔍</span><span>ค้นหา</span>
+    </button>
+    <a href="https://docs.google.com/spreadsheets/d/1FTEvVUR1-Kreupu-6ZIr-3wTXDGJb52BvOgnTt5fVfc/edit" target="_blank" class="nav-item">
+      <span class="nav-icon">📊</span><span>ชีตหลัก</span>
+    </a>
+  </nav>
+
+  <div class="toast" id="toast">📋 คัดลอกลิงก์แล้ว</div>
+
+  <script>
+    const DATA = [
+      {"id": 1, "seq": 1, "cat_id": "management", "cat_short": "บริหารและติดตาม", "name": "ตารางงาน SUK", "description": "บันทึกงาน ปัญหา ขั้นตอนถัดไป และผู้รับผิดชอบ", "url": "https://docs.google.com/spreadsheets/d/1-g0Px1bxaeeNbbom9ZsNL0mCWlgfr3qBXHxcswMq6QU/edit", "icon": "📋"},
+      {"id": 2, "seq": 2, "cat_id": "management", "cat_short": "บริหารและติดตาม", "name": "คณะสุโขทัย — ระบบติดตามงาน", "description": "รวบรวมงาน รายชื่อทีม (P01-P05) และประวัติการอัปเดต", "url": "https://docs.google.com/spreadsheets/d/1c3Rqaly6fqmZS9N1m4PeSt_glXhkRhibwgYiqpoIix8/edit", "icon": "📋"},
+      {"id": 3, "seq": 3, "cat_id": "management", "cat_short": "บริหารและติดตาม", "name": "ตรวจสอบความคืบหน้าปัญหา SKT", "description": "ตารางติดตามความคืบหน้าปัญหาที่แจ้ง", "url": "https://docs.google.com/spreadsheets/d/1hpvhtoMnJ-96E_iunPvEtnCM6V68eYtKAk58z_KdkHU/edit", "icon": "⚠️"},
+      {"id": 4, "seq": 4, "cat_id": "management", "cat_short": "บริหารและติดตาม", "name": "เช็คกิจกรรมทั้งหมด", "description": "ตารางติดตามการคัดนักกีฬา/กิจกรรมต่างๆ ภายในคณะสี", "url": "https://docs.google.com/spreadsheets/d/1qlJJD3vviepa5sEYPBV0LfmIV7sHnYF_2i0hUjwcqEk/edit", "icon": "📅"},
+      {"id": 5, "seq": 5, "cat_id": "management", "cat_short": "บริหารและติดตาม", "name": "รวมลิ้ง Google sheet STK (สำหรับสภาสีเท่านั้น)", "description": "รวบรวมลิงก์ชีตกลางสำหรับสภาสี", "url": "https://docs.google.com/spreadsheets/d/14nioRYD3qUtYZNpMqyU_lKNP6mb8f337mwslUXRh2_0/edit", "icon": "📄"},
+      {"id": 6, "seq": 6, "cat_id": "management", "cat_short": "บริหารและติดตาม", "name": "ข้อเสนอแนะ / แจ้งปัญหา SUK", "description": "รับข้อเสนอแนะและแจ้งปัญหาภายในคณะสี", "url": "https://docs.google.com/spreadsheets/d/16p14-kItoAC2iwKzlJ4F6YbMYfnHbt8zXHzm2hN1xXI/edit", "icon": "⚠️"},
+      {"id": 7, "seq": 7, "cat_id": "management", "cat_short": "บริหารและติดตาม", "name": "แบบฟอร์มเสนอธีมกีฬาสีประจำปี (การตอบกลับ)", "description": "ข้อมูลข้อเสนอธีมกีฬาสีประจำปี", "url": "https://docs.google.com/spreadsheets/d/16zd7PMt1hsOGG4hDPL3w1V9d9uHgGZglQ7Cr1Qck2Tg/edit", "icon": "📥"},
+      {"id": 8, "seq": 8, "cat_id": "management", "cat_short": "บริหารและติดตาม", "name": "รายชื่อห้องคณะสี", "description": "ทะเบียนรายชื่อนักเรียนและห้องในคณะสีสุโขทัย", "url": "https://docs.google.com/spreadsheets/d/1-iif-5OL9zeI197_RPOybM6NjqhWnDTFBNjKRyFNEIs/edit", "icon": "📄"},
+      {"id": 9, "seq": 9, "cat_id": "management", "cat_short": "บริหารและติดตาม", "name": "สเตน สุโขทัย", "description": "วางแผนและการจัดการสแตนด์เชียร์", "url": "https://docs.google.com/spreadsheets/d/1gK9FXzGxDvaZk-DsHizn7h6sc9DMkpxc3YxKgOANlaI/edit", "icon": "🎪"},
+      {"id": 10, "seq": 10, "cat_id": "management", "cat_short": "บริหารและติดตาม", "name": "สตาฟสเตน สุโขทัย", "description": "รายชื่อและการแบ่งหน้าที่สตาฟสแตนด์เชียร์", "url": "https://docs.google.com/spreadsheets/d/1MA-SN4OGx7ixtBPPhLwGEe3bjUonGsdcnkkMgIQlOPQ/edit", "icon": "🤝"},
+      {"id": 11, "seq": 1, "cat_id": "recruitment", "cat_short": "รับสมัครและคัดเลือก", "name": "🎀รับสมัครเฮดกีฬา (การตอบกลับ)", "description": "การตอบกลับรับสมัครหัวหน้านักกีฬาแต่ละประเภท", "url": "https://docs.google.com/spreadsheets/d/1L5-mjOneCH8NdT7Yse6QsoVlx5IpxsXJ8wo72GVyujc/edit", "icon": "📥"},
+      {"id": 12, "seq": 2, "cat_id": "recruitment", "cat_short": "รับสมัครและคัดเลือก", "name": "🎈รับสมัครคทากร (การตอบกลับ)", "description": "การตอบกลับรับสมัครดรัมเมเยอร์ / คทากร", "url": "https://docs.google.com/spreadsheets/d/11p4i-X4fcXE03yZUD39vziF34Eg-Aorap6m36CMpInQ/edit", "icon": "🎈"},
+      {"id": 13, "seq": 3, "cat_id": "recruitment", "cat_short": "รับสมัครและคัดเลือก", "name": "🎈รับสมัครผู้นำเชียร์ (การตอบกลับ)", "description": "การตอบกลับรับสมัครเชียร์ลีดเดอร์", "url": "https://docs.google.com/spreadsheets/d/12JZH0C-YWXN28K55ZeimgGf5JFXmHeCGyxqhOmtNjyE/edit", "icon": "📣"},
+      {"id": 14, "seq": 4, "cat_id": "recruitment", "cat_short": "รับสมัครและคัดเลือก", "name": "✌🏻สตาฟการแสดงกลางแจ้ง คณะสุโขทัย ประจำปีการศึกษา2569 (การตอบกลับ)", "description": "การตอบกลับสตาฟการแสดงกลางแจ้ง", "url": "https://docs.google.com/spreadsheets/d/1xS3tmThMwJW0wq0-O5FaSgtJR2KInPXz9FHUnqz9HwI/edit", "icon": "🤝"},
+      {"id": 15, "seq": 5, "cat_id": "recruitment", "cat_short": "รับสมัครและคัดเลือก", "name": "✌🏻สตาฟกองเชียร์ คณะสุโขทัย ประจำปีการศึกษา2569 (การตอบกลับ)", "description": "การตอบกลับสตาฟกองเชียร์", "url": "https://docs.google.com/spreadsheets/d/1WT_OI43SJ8AiRYiNH6Q1_zuME5oREN3gtdXHep7h1eo/edit", "icon": "🤝"},
+      {"id": 16, "seq": 6, "cat_id": "recruitment", "cat_short": "รับสมัครและคัดเลือก", "name": "🤹🏻‍♀️แบบฟอร์มการรับสมัครครีเอทีฟและการออกแบบ คณะสุโขทัยประจำปี2569 (การตอบกลับ)", "description": "การตอบกลับฝ่ายออกแบบและสื่ออินโฟกราฟิก", "url": "https://docs.google.com/spreadsheets/d/14U3jRAltmB_HnnIUCY5NHLbPsnN5wq-pR8157KBaI0s/edit", "icon": "🎨"},
+      {"id": 17, "seq": 7, "cat_id": "recruitment", "cat_short": "รับสมัครและคัดเลือก", "name": "🤹🏻‍♀️แบบฟอร์มการรับสมัครทีมคอนเทนต์ คณะสุโขทัยประจำปี2569 (การตอบกลับ)", "description": "การตอบกลับทีมคอนเทนต์และภาพถ่าย", "url": "https://docs.google.com/spreadsheets/d/13q7bu-iPTqyqhM_FeubeayL4e-cgj1ELwpVZb7nW1Bk/edit", "icon": "📸"},
+      {"id": 18, "seq": 8, "cat_id": "recruitment", "cat_short": "รับสมัครและคัดเลือก", "name": "🤹🏻‍♀️แบบฟอร์มการรับสมัครสวัสดิการ คณะสุโขทัยประจำปี2569 (การตอบกลับ)", "description": "การตอบกลับฝ่ายสวัสดิการ", "url": "https://docs.google.com/spreadsheets/d/1r2yNqMwX5wQSu-QrqgeCiU2cDArdorSOGqoHKX_iV04/edit", "icon": "🥤"},
+      {"id": 19, "seq": 9, "cat_id": "recruitment", "cat_short": "รับสมัครและคัดเลือก", "name": "ตารางคัดนักกีฬา", "description": "ตารางกำหนดการและผลการคัดเลือกนักกีฬา", "url": "https://docs.google.com/spreadsheets/d/1-RlcoSnxuqk9IQPwfxhzevDwU7BXoYUHkaE5M0VgMSs/edit", "icon": "📅"},
+      {"id": 20, "seq": 10, "cat_id": "recruitment", "cat_short": "รับสมัครและคัดเลือก", "name": "คัดนักกีฬา", "description": "ข้อมูลการคัดเลือกนักกีฬา", "url": "https://docs.google.com/spreadsheets/d/1--CF7LwlqPDIhIHTfMxgGHI03V5xI_EwHvn3OoaWu7U/edit", "icon": "🏃"},
+      {"id": 21, "seq": 1, "cat_id": "athletes", "cat_short": "ทะเบียนนักกีฬา", "name": "รายการแข่งขันกีฬา", "description": "ข้อมูลชนิดกีฬา รายการแข่งขัน และจำนวนผู้เล่น", "url": "https://docs.google.com/spreadsheets/d/1-nL8E8hxRtSjc3ZY7Ath8-IVMIXp5IsQaYJc3meClfM/edit", "icon": "🏅"},
+      {"id": 22, "seq": 2, "cat_id": "athletes", "cat_short": "ทะเบียนนักกีฬา", "name": "🏸แบดมินตัน SUK", "description": "ทะเบียนนักกีฬาแบดมินตัน", "url": "https://docs.google.com/spreadsheets/d/1xJKeIqFQviV23mR4DNK-hpwzjmApUjRRmWBR8T9FIz4/edit", "icon": "🏸"},
+      {"id": 23, "seq": 3, "cat_id": "athletes", "cat_short": "ทะเบียนนักกีฬา", "name": "🥇แบดมินตัน คณะสุโขทัย ประจำปี2569 (การตอบกลับ)", "description": "แบบตอบกลับสมัครแข่งแบดมินตัน", "url": "https://docs.google.com/spreadsheets/d/1EhaHN6H7SZSdGS9pbGVJELkQRlknu35oyITHgKoyp7Y/edit", "icon": "🏸"},
+      {"id": 24, "seq": 4, "cat_id": "athletes", "cat_short": "ทะเบียนนักกีฬา", "name": "🏐วอลเลย์บอล SUK", "description": "ทะเบียนนักกีฬาวอลเลย์บอล", "url": "https://docs.google.com/spreadsheets/d/1pPRFJujU_3yp5Co631NgX_5MuTP84A7STrUQ-zXgk3U/edit", "icon": "🏐"},
+      {"id": 25, "seq": 5, "cat_id": "athletes", "cat_short": "ทะเบียนนักกีฬา", "name": "🥇วอลเลย์บอล คณะสุโขทัย ประจำปี2569 (การตอบกลับ)", "description": "แบบตอบกลับสมัครแข่งวอลเลย์บอล", "url": "https://docs.google.com/spreadsheets/d/1ZfBNENNOLLblFwGh5nWG9uIKGV-cYrcuh1LlXVxDVqU/edit", "icon": "🏐"},
+      {"id": 26, "seq": 6, "cat_id": "athletes", "cat_short": "ทะเบียนนักกีฬา", "name": "🏀บาสเกตบอล SUK", "description": "ทะเบียนนักกีฬาบาสเกตบอล", "url": "https://docs.google.com/spreadsheets/d/19ixZV5e4vXOvuim6U8F4PqpYVjN3Lpn0l5SasKQeBI0/edit", "icon": "🏀"},
+      {"id": 27, "seq": 7, "cat_id": "athletes", "cat_short": "ทะเบียนนักกีฬา", "name": "🥇บาสเกตบอล คณะสุโขทัย ประจำปี2569 (การตอบกลับ)", "description": "แบบตอบกลับสมัครแข่งบาสเกตบอล", "url": "https://docs.google.com/spreadsheets/d/1DPgu_xft0DT3abqAyF77nXBpT6iQhrFwpY05Z2ZAmVM/edit", "icon": "🏀"},
+      {"id": 28, "seq": 8, "cat_id": "athletes", "cat_short": "ทะเบียนนักกีฬา", "name": "⚽️รายชื่อฟุตบอล SUK", "description": "ทะเบียนนักกีฬาฟุตบอล", "url": "https://docs.google.com/spreadsheets/d/1zCNqMaAIHAJLqsW7O6CRZjOWyC-mSz05pTdz3xEZ5t4/edit", "icon": "⚽"},
+      {"id": 29, "seq": 9, "cat_id": "athletes", "cat_short": "ทะเบียนนักกีฬา", "name": "🥇ฟุตบอล คณะสุโขทัย ประจำปี2569 (การตอบกลับ)", "description": "แบบตอบกลับสมัครแข่งฟุตบอล", "url": "https://docs.google.com/spreadsheets/d/19E4Sz8FsIQ7FcuU_K-vKojzJU2NvYuuAFZXsInSzNr8/edit", "icon": "⚽"},
+      {"id": 30, "seq": 10, "cat_id": "athletes", "cat_short": "ทะเบียนนักกีฬา", "name": "รายชื่อนักกีฬากรีฑา", "description": "ทะเบียนนักกีฬากรีฑาประเภทต่างๆ", "url": "https://docs.google.com/spreadsheets/d/1svYPqNggWDWuKkEOaf5JyMsoHF0Mpt2kqdYqwlDhiNM/edit", "icon": "👟"},
+      {"id": 31, "seq": 11, "cat_id": "athletes", "cat_short": "ทะเบียนนักกีฬา", "name": "🥇กรีฑา คณะสุโขทัย ประจำปี2569 (การตอบกลับ)", "description": "แบบตอบกลับสมัครแข่งกรีฑา", "url": "https://docs.google.com/spreadsheets/d/1EAY3gkZ0zpFsxR1Xx8HNqcCksf4ign_xUjSu7QnWTt8/edit", "icon": "👟"},
+      {"id": 32, "seq": 12, "cat_id": "athletes", "cat_short": "ทะเบียนนักกีฬา", "name": "🥇เทเบิลเทนนิส คณะสุโขทัย ประจำปี2569 (การตอบกลับ)", "description": "แบบตอบกลับสมัครแข่งเทเบิลเทนนิส", "url": "https://docs.google.com/spreadsheets/d/1df7cbJ9wWHh8Rw6OIl2ABDKEAxvLNvZc6ewEGO9rFoA/edit", "icon": "🏓"},
+      {"id": 33, "seq": 13, "cat_id": "athletes", "cat_short": "ทะเบียนนักกีฬา", "name": "🥇เซปักตะกร้อ คณะสุโขทัย ประจำปี2569 (การตอบกลับ)", "description": "แบบตอบกลับสมัครแข่งเซปักตะกร้อ", "url": "https://docs.google.com/spreadsheets/d/1SfbI1zVuq1UmHcyVgH9iTniMhNyP4tMtVz3mzLIdGTE/edit", "icon": "🥅"},
+      {"id": 34, "seq": 14, "cat_id": "athletes", "cat_short": "ทะเบียนนักกีฬา", "name": "🎮E-SPORT (ROV) SUK", "description": "ทะเบียนนักกีฬา E-Sport ROV", "url": "https://docs.google.com/spreadsheets/d/1g_gIbxF76u-30sSNmWeeBmozA0muN6Vcrdck05OOWds/edit", "icon": "🎮"},
+      {"id": 35, "seq": 15, "cat_id": "athletes", "cat_short": "ทะเบียนนักกีฬา", "name": "🥇E-SPORT (ROV) คณะสุโขทัย ประจำปี2569 (การตอบกลับ)", "description": "แบบตอบกลับสมัครแข่ง E-Sport ROV", "url": "https://docs.google.com/spreadsheets/d/1MTQfTtHhwN6UxAyzyilHyc-nuLf7kETGvjlJFWrWSzw/edit", "icon": "🎮"},
+      {"id": 36, "seq": 1, "cat_id": "inventory", "cat_short": "คลังพัสดุและยืมคืน", "name": "สต๊อกภายในคณะสี", "description": "ตารางสต็อกสิ่งของ อุปกรณ์ พร็อพ และสถานะคงเหลือในห้องคณะสี", "url": "https://docs.google.com/spreadsheets/d/1SoI9qnZuanrg7BCFG6xYpkD1Pe23VBvgFGeWPmECM8s/edit", "icon": "📦"},
+      {"id": 37, "seq": 2, "cat_id": "inventory", "cat_short": "คลังพัสดุและยืมคืน", "name": "ระบบจัดการคลัง STK", "description": "ระบบสต็อกหลักและบันทึกการเบิกใช้อุปกรณ์", "url": "https://docs.google.com/spreadsheets/d/1E90NSALI4goWv5Lk2gTh8Pn25EWv5apVUWYw-nSuzRY/edit", "icon": "📦"},
+      {"id": 38, "seq": 3, "cat_id": "inventory", "cat_short": "คลังพัสดุและยืมคืน", "name": "ระบบยืมคืน STK", "description": "ระบบบันทึกการตอบแบบฟอร์มยืมคืนอุปกรณ์", "url": "https://docs.google.com/spreadsheets/d/1d-o3HCP5kqoC-WidVjZLEYrkCVYmajsOtNz5E-KD4PU/edit", "icon": "📦"}
+    ];
+
+    let currentCategory = 'all';
+    let favorites = JSON.parse(localStorage.getItem('suk_favs') || '[]');
+
+    const cardsGrid = document.getElementById('cardsGrid');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearch = document.getElementById('clearSearch');
+    const categoryTabs = document.getElementById('categoryTabs');
+    const itemCount = document.getElementById('itemCount');
+    const favCount = document.getElementById('favCount');
+    const emptyState = document.getElementById('emptyState');
+    const activeFilterLabel = document.getElementById('activeFilterLabel');
+    const themeBtn = document.getElementById('themeBtn');
+    const toast = document.getElementById('toast');
+
+    function updateFavCount() { favCount.textContent = favorites.length; }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    function toggleFavorite(id, e) {
+      e.stopPropagation();
+      const idx = favorites.indexOf(id);
+      if (idx > -1) {
+        favorites.splice(idx, 1);
+        showToast('ลบออกจากรายการโปรด');
+      } else {
+        favorites.push(id);
+        showToast('⭐ เพิ่มในรายการโปรดแล้ว');
+      }
+      localStorage.setItem('suk_favs', JSON.stringify(favorites));
+      updateFavCount();
+      renderCards();
+    }
+
+    function copyLink(url, e) {
+      e.stopPropagation();
+      navigator.clipboard.writeText(url).then(() => showToast('📋 คัดลอกลิงก์แล้ว')).catch(() => showToast('คัดลอกไม่สำเร็จ'));
+    }
+
+    function renderCards() {
+      const q = searchInput.value.trim().toLowerCase();
+      let list = DATA.filter(it => {
+        if (currentCategory === 'fav') return favorites.includes(it.id);
+        if (currentCategory !== 'all' && it.cat_id !== currentCategory) return false;
+        if (q) return it.name.toLowerCase().includes(q) || it.description.toLowerCase().includes(q) || it.cat_short.toLowerCase().includes(q);
+        return true;
+      });
+
+      itemCount.textContent = list.length;
+      emptyState.style.display = list.length === 0 ? 'block' : 'none';
+
+      cardsGrid.innerHTML = list.map(it => {
+        const isFav = favorites.includes(it.id);
+        return `
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon-box">${it.icon}</div>
+              <div class="card-title-group">
+                <span class="card-category-tag">${it.cat_short} #${it.seq}</span>
+                <div class="card-title">${it.name}</div>
+              </div>
+              <button class="card-fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite(${it.id}, event)">
+                ${isFav ? '★' : '☆'}
+              </button>
+            </div>
+            <p class="card-desc">${it.description || '-'}</p>
+            <div class="card-actions">
+              <a href="${it.url}" target="_blank" rel="noopener noreferrer" class="btn-open">เปิดไฟล์ชีต ↗</a>
+              <button class="btn-copy" onclick="copyLink('${it.url}', event)">🔗 คัดลอก</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterCategory(catId) {
+      currentCategory = catId;
+      document.querySelectorAll('.cat-chip').forEach(c => c.classList.toggle('active', c.getAttribute('data-cat') === catId));
+      const labels = {
+        'all': 'แสดงทั้งหมด', 'fav': '⭐ รายการโปรดของคุณ',
+        'management': 'หมวดที่ 1: บริหารและติดตาม', 'recruitment': 'หมวดที่ 2: รับสมัครและคัดเลือก',
+        'athletes': 'หมวดที่ 3: ทะเบียนนักกีฬา', 'inventory': 'หมวดที่ 4: คลังพัสดุและยืมคืน'
+      };
+      activeFilterLabel.textContent = labels[catId] || 'ผลการกรอง';
+      document.querySelectorAll('.bottom-nav .nav-item').forEach((it, idx) => {
+        it.classList.toggle('active', (catId === 'all' && idx === 0) || (catId === 'fav' && idx === 1));
+      });
+      renderCards();
+    }
+
+    categoryTabs.addEventListener('click', (e) => {
+      const btn = e.target.closest('.cat-chip');
+      if (btn) filterCategory(btn.getAttribute('data-cat'));
+    });
+
+    searchInput.addEventListener('input', () => {
+      clearSearch.classList.toggle('visible', searchInput.value.length > 0);
+      renderCards();
+    });
+
+    clearSearch.addEventListener('click', () => {
+      searchInput.value = '';
+      clearSearch.classList.remove('visible');
+      renderCards();
+      searchInput.focus();
+    });
+
+    themeBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const next = isDark ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      themeBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+      localStorage.setItem('suk_theme', next);
+    });
+
+    const savedTheme = localStorage.getItem('suk_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+    updateFavCount();
+    renderCards();
+  </script>
+</body>
+</html>
